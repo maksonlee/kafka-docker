@@ -4,16 +4,26 @@ services:
     image: wurstmeister/zookeeper
     ports:
       - "2181:2181"
+    volumes:
+      - zookeeper-data:/opt/zookeeper-3.4.13/data
     restart: unless-stopped
 
   kafka:
-    build: .
+    image: wurstmeister/kafka:2.13-2.8.1
     ports:
-      - "9092"
+      - "9092:9092"
     environment:
       DOCKER_API_VERSION: 1.22
-      KAFKA_ADVERTISED_HOST_NAME: 192.168.99.100
+      KAFKA_ADVERTISED_HOST_NAME: localhost
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LOG_DIRS: /kafka
+      KAFKA_LOG_RETENTION_MS: 60000
+      KAFKA_LOG_SEGMENT_BYTES: 26214400
     volumes:
+      - kafka-data:/kafka
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
+
+volumes:
+  kafka-data:
+  zookeeper-data:
